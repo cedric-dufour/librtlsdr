@@ -1,0 +1,48 @@
+Source: rtl-sdr
+Section: misc
+Priority: optional
+Maintainer: Cedric Dufour <cedric.dufour@ced-network.net>
+Build-Depends: cdbs, cmake (>= 2.8), debhelper (>= 5), help2man, libusb-1.0-0-dev
+Standards-Version: 3.8.4
+Homepage: http://sdr.osmocom.org
+
+Package: librtlsdr
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: udev
+Description: RTL-SDR library
+ OsmoSDR's RTL-SDR project allows dongles based on the Realtek RTL2832U to be
+ used as a cheap SDR (Software Defined Radio), since the chip allows transfer-
+ ring the raw I/Q samples to the host, and then (officially) used for
+ DAB/DAB+/FM demodulation.
+ .
+ This package contains the RTL-SDR library, which provides the API that allows
+ to access and control RTL2832U-based dongles.
+
+Package: librtlsdr-dev
+Section: libdevel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: RTL-SDR library - development resources
+ OsmoSDR's RTL-SDR project allows dongles based on the Realtek RTL2832U to be
+ used as a cheap SDR (Software Defined Radio), since the chip allows transfer-
+ ring the raw I/Q samples to the host, and then (officially) used for
+ DAB/DAB+/FM demodulation.
+ .
+ This package contains the development resources necessary to develop 3rd-party
+ software which needs to use RTL2832U-based dongles.
+
+Package: rtlsdr-bin
+Section: utils
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: RTL-SDR binaries
+ OsmoSDR's RTL-SDR project allows dongles based on the Realtek RTL2832U to be
+ used as a cheap SDR (Software Defined Radio), since the chip allows transfer-
+ ring the raw I/Q samples to the host, and then (officially) used for
+ DAB/DAB+/FM demodulation.
+ .
+ This package contains miscellaneous utilities to test and discover the
+ working behavior and functions of RTL2832U-based dongles.
+

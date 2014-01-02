@@ -1,0 +1,39 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/cmake.mk
+
+VERSION = $(shell ./git-version-gen src)
+
+install/librtlsdr::
+	# Copy udev rules
+	mkdir -p debian/tmp/lib/udev/rules.d
+	cp rtl-sdr.rules debian/tmp/lib/udev/rules.d/99-rtl-sdr.rules
+	# Copy modprobe configuration
+	mkdir -p debian/tmp/etc/modprobe.d
+	cp debian/etc/modprobe.d/librtlsdr.conf debian/tmp/etc/modprobe.d/librtlsdr.conf
+
+install/rtlsdr-bin::
+	# Create man pages
+	mkdir -p debian/tmp/usr/share/man/man1
+	help2man --name 'a simple ADS-B decoder' \
+		--help-option --help --version-string $(VERSION) --no-discard-stderr --no-info \
+		debian/tmp/usr/bin/rtl_adsb | fgrep -v 'invalid option' > debian/tmp/usr/share/man/man1/rtl_adsb.1
+	help2man --name 'an EEPROM programming tool for RTL2832 based DVB-T receivers' \
+		--help-option --help --version-string $(VERSION) --no-discard-stderr --no-info \
+		debian/tmp/usr/bin/rtl_eeprom | fgrep -v 'invalid option' > debian/tmp/usr/share/man/man1/rtl_eeprom.1
+	help2man --name 'a simple narrow band FM demodulator for RTL2832 based DVB-T receivers' \
+		--help-option --help --version-string $(VERSION) --no-discard-stderr --no-info \
+		debian/tmp/usr/bin/rtl_fm | fgrep -v 'invalid option' > debian/tmp/usr/share/man/man1/rtl_fm.1
+	help2man --name 'an I/Q recorder for RTL2832 based DVB-T receivers' \
+		--help-option --help --version-string $(VERSION) --no-discard-stderr --no-info \
+		debian/tmp/usr/bin/rtl_sdr | fgrep -v 'invalid option' > debian/tmp/usr/share/man/man1/rtl_sdr.1
+	help2man --name 'an I/Q spectrum server for RTL2832 based DVB-T receivers' \
+		--help-option --help --version-string $(VERSION) --no-discard-stderr --no-info \
+		debian/tmp/usr/bin/rtl_tcp | fgrep -v 'invalid option' > debian/tmp/usr/share/man/man1/rtl_tcp.1
+	help2man --name 'a benchmark tool for RTL2832 based DVB-T receivers' \
+		--help-option --help --version-string $(VERSION) --no-discard-stderr --no-info \
+		debian/tmp/usr/bin/rtl_test | fgrep -v 'invalid option' > debian/tmp/usr/share/man/man1/rtl_test.1
+
+clean::
+

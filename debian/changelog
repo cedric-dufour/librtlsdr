@@ -1,0 +1,6 @@
+rtl-sdr (0.5~git20131227) UNRELEASED; urgency=low
+
+  * INITIAL DEBIAN PACKAGING
+
+ -- Cedric Dufour <cedric.dufour@ced-network.net>  Thu, 02 Jan 2014 15:33:33 +0100
+

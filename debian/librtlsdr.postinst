@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+[ "${1}" != 'configure' ] && exit 0
+
+# Remove DVB-USB kernel module (unclaim device)
+rmmod dvb_usb_rtl28xxu || :
+
+# Refresh library loader
+ldconfig
+
+# Enforce udev rules changes
+[ -n "$(which udevadm)" ] && udevadm trigger
+
+# Exit
+exit 0
+
