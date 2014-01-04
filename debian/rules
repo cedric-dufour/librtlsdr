@@ -16,22 +16,32 @@ install/librtlsdr::
 install/rtlsdr-bin::
 	# Create man pages
 	mkdir -p debian/tmp/usr/share/man/man1
-	help2man --name 'a simple ADS-B decoder' \
+	LD_LIBRARY_PATH=debian/tmp/usr/lib:$${LD_LIBRARY_PATH} help2man \
+		--name 'a simple ADS-B decoder' \
 		--help-option --help --version-string $(VERSION) --no-discard-stderr --no-info \
 		debian/tmp/usr/bin/rtl_adsb | fgrep -v 'invalid option' > debian/tmp/usr/share/man/man1/rtl_adsb.1
-	help2man --name 'an EEPROM programming tool for RTL2832 based DVB-T receivers' \
+	LD_LIBRARY_PATH=debian/tmp/usr/lib:$${LD_LIBRARY_PATH} help2man \
+		--name 'an EEPROM programming tool for RTL2832 based DVB-T receivers' \
 		--help-option --help --version-string $(VERSION) --no-discard-stderr --no-info \
 		debian/tmp/usr/bin/rtl_eeprom | fgrep -v 'invalid option' > debian/tmp/usr/share/man/man1/rtl_eeprom.1
-	help2man --name 'a simple narrow band FM demodulator for RTL2832 based DVB-T receivers' \
+	LD_LIBRARY_PATH=debian/tmp/usr/lib:$${LD_LIBRARY_PATH} help2man \
+		--name 'a simple narrow band FM demodulator for RTL2832 based DVB-T receivers' \
 		--help-option --help --version-string $(VERSION) --no-discard-stderr --no-info \
 		debian/tmp/usr/bin/rtl_fm | fgrep -v 'invalid option' > debian/tmp/usr/share/man/man1/rtl_fm.1
-	help2man --name 'an I/Q recorder for RTL2832 based DVB-T receivers' \
+	LD_LIBRARY_PATH=debian/tmp/usr/lib:$${LD_LIBRARY_PATH} help2man \
+		--name 'a simple FFT logger for RTL2832 based DVB-T receivers' \
+		--help-option --help --version-string $(VERSION) --no-discard-stderr --no-info \
+		debian/tmp/usr/bin/rtl_power | fgrep -v 'invalid option' > debian/tmp/usr/share/man/man1/rtl_power.1
+	LD_LIBRARY_PATH=debian/tmp/usr/lib:$${LD_LIBRARY_PATH} help2man \
+		--name 'an I/Q recorder for RTL2832 based DVB-T receivers' \
 		--help-option --help --version-string $(VERSION) --no-discard-stderr --no-info \
 		debian/tmp/usr/bin/rtl_sdr | fgrep -v 'invalid option' > debian/tmp/usr/share/man/man1/rtl_sdr.1
-	help2man --name 'an I/Q spectrum server for RTL2832 based DVB-T receivers' \
+	LD_LIBRARY_PATH=debian/tmp/usr/lib:$${LD_LIBRARY_PATH} help2man \
+		--name 'an I/Q spectrum server for RTL2832 based DVB-T receivers' \
 		--help-option --help --version-string $(VERSION) --no-discard-stderr --no-info \
 		debian/tmp/usr/bin/rtl_tcp | fgrep -v 'invalid option' > debian/tmp/usr/share/man/man1/rtl_tcp.1
-	help2man --name 'a benchmark tool for RTL2832 based DVB-T receivers' \
+	LD_LIBRARY_PATH=debian/tmp/usr/lib:$${LD_LIBRARY_PATH} help2man \
+		--name 'a benchmark tool for RTL2832 based DVB-T receivers' \
 		--help-option --help --version-string $(VERSION) --no-discard-stderr --no-info \
 		debian/tmp/usr/bin/rtl_test | fgrep -v 'invalid option' > debian/tmp/usr/share/man/man1/rtl_test.1
 
