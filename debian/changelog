@@ -1,3 +1,10 @@
+rtl-sdr (0.5.3~git20140207) UNRELEASED; urgency=low
+
+  * Merged upstream changes
+  * New version: 0.5.3
+
+ -- Cedric Dufour <cedric.dufour@ced-network.net>  Fri, 07 Feb 2014 15:40:23 +0100
+
 rtl-sdr (0.5~git20131227) UNRELEASED; urgency=low
 
   * INITIAL DEBIAN PACKAGING
