@@ -1,6 +1,6 @@
 /*
  * rtl-sdr, turns your Realtek RTL2832 based DVB dongle into a SDR receiver
- * Copyright (C) 2012-2013 by Steve Markgraf <steve@steve-m.de>
+ * Copyright (C) 2012-2014 by Steve Markgraf <steve@steve-m.de>
  * Copyright (C) 2012 by Dimitri Stolnikov <horiz0n@gmx.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -96,6 +96,7 @@ struct rtlsdr_dev {
 	rtlsdr_read_async_cb_t cb;
 	void *cb_ctx;
 	enum rtlsdr_async_status async_status;
+	int async_cancel;
 	/* rtl demod context */
 	uint32_t rate; /* Hz */
 	uint32_t rtl_xtal; /* Hz */
@@ -290,6 +291,9 @@ typedef struct rtlsdr_dongle {
 static rtlsdr_dongle_t known_devices[] = {
 	{ 0x0bda, 0x2832, "Generic RTL2832U" },
 	{ 0x0bda, 0x2838, "Generic RTL2832U OEM" },
+	{ 0x0413, 0x6680, "DigitalNow Quad DVB-T PCI-E card" },
+	{ 0x0413, 0x6f0f, "Leadtek WinFast DTV Dongle mini D" },
+	{ 0x0458, 0x707f, "Genius TVGo DVB-T03 USB dongle (Ver. B)" },
 	{ 0x0ccd, 0x00a9, "Terratec Cinergy T Stick Black (rev 1)" },
 	{ 0x0ccd, 0x00b3, "Terratec NOXON DAB/DAB+ USB dongle (rev 1)" },
 	{ 0x0ccd, 0x00b4, "Terratec Deutschlandradio DAB Stick" },
@@ -307,27 +311,25 @@ static rtlsdr_dongle_t known_devices[] = {
 	{ 0x185b, 0x0620, "Compro Videomate U620F"},
 	{ 0x185b, 0x0650, "Compro Videomate U650F"},
 	{ 0x185b, 0x0680, "Compro Videomate U680F"},
+	{ 0x1b80, 0xd393, "GIGABYTE GT-U7300" },
+	{ 0x1b80, 0xd394, "DIKOM USB-DVBT HD" },
+	{ 0x1b80, 0xd395, "Peak 102569AGPK" },
+	{ 0x1b80, 0xd397, "KWorld KW-UB450-T USB DVB-T Pico TV" },
+	{ 0x1b80, 0xd398, "Zaapa ZT-MINDVBZP" },
+	{ 0x1b80, 0xd39d, "SVEON STV20 DVB-T USB & FM" },
+	{ 0x1b80, 0xd3a4, "Twintech UT-40" },
+	{ 0x1b80, 0xd3a8, "ASUS U3100MINI_PLUS_V2" },
+	{ 0x1b80, 0xd3af, "SVEON STV27 DVB-T USB & FM" },
+	{ 0x1b80, 0xd3b0, "SVEON STV21 DVB-T USB & FM" },
+	{ 0x1d19, 0x1101, "Dexatek DK DVB-T Dongle (Logilink VG0002A)" },
+	{ 0x1d19, 0x1102, "Dexatek DK DVB-T Dongle (MSI DigiVox mini II V3.0)" },
+	{ 0x1d19, 0x1103, "Dexatek Technology Ltd. DK 5217 DVB-T Dongle" },
+	{ 0x1d19, 0x1104, "MSI DigiVox Micro HD" },
 	{ 0x1f4d, 0xa803, "Sweex DVB-T USB" },
 	{ 0x1f4d, 0xb803, "GTek T803" },
 	{ 0x1f4d, 0xc803, "Lifeview LV5TDeluxe" },
 	{ 0x1f4d, 0xd286, "MyGica TD312" },
 	{ 0x1f4d, 0xd803, "PROlectrix DV107669" },
-	{ 0x1b80, 0xd397, "KWorld KW-UB450-T USB DVB-T Pico TV" },
-	{ 0x1b80, 0xd398, "Zaapa ZT-MINDVBZP" },
-	{ 0x1b80, 0xd3a4, "Twintech UT-40" },
-	{ 0x1b80, 0xd3a8, "ASUS U3100MINI_PLUS_V2" },
-	{ 0x1d19, 0x1101, "Dexatek DK DVB-T Dongle (Logilink VG0002A)" },
-	{ 0x1d19, 0x1102, "Dexatek DK DVB-T Dongle (MSI DigiVox mini II V3.0)" },
-	{ 0x1d19, 0x1103, "Dexatek Technology Ltd. DK 5217 DVB-T Dongle" },
-	{ 0x1d19, 0x1104, "MSI DigiVox Micro HD" },
-	{ 0x0413, 0x6680, "DigitalNow Quad DVB-T PCI-E card" },
-	{ 0x0413, 0x6f0f, "Leadtek WinFast DTV Dongle mini D" },
-	{ 0x0458, 0x707f, "Genius TVGo DVB-T03 USB dongle (Ver. B)" },
-	{ 0x1b80, 0xd393, "GIGABYTE GT-U7300" },
-	{ 0x1b80, 0xd394, "DIKOM USB-DVBT HD" },
-	{ 0x1b80, 0xd395, "Peak 102569AGPK" },
-	{ 0x1b80, 0xd39d, "SVEON STV20 DVB-T USB & FM" },
-	{ 0x1b80, 0xd3b0, "SVEON STV21 DVB-T USB & FM" },
 };
 
 #define DEFAULT_BUF_NUMBER	32
@@ -336,8 +338,6 @@ static rtlsdr_dongle_t known_devices[] = {
 #define DEF_RTL_XTAL_FREQ	28800000
 #define MIN_RTL_XTAL_FREQ	(DEF_RTL_XTAL_FREQ - 1000)
 #define MAX_RTL_XTAL_FREQ	(DEF_RTL_XTAL_FREQ + 1000)
-
-#define MAX_SAMP_RATE		3200000
 
 #define CTRL_IN		(LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_IN)
 #define CTRL_OUT	(LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT)
@@ -534,7 +534,7 @@ int rtlsdr_demod_write_reg(rtlsdr_dev_t *dev, uint8_t page, uint16_t addr, uint1
 
 void rtlsdr_set_gpio_bit(rtlsdr_dev_t *dev, uint8_t gpio, int val)
 {
-	uint8_t r;
+	uint16_t r;
 
 	gpio = 1 << gpio;
 	r = rtlsdr_read_reg(dev, SYSB, GPO, 1);
@@ -1053,20 +1053,24 @@ int rtlsdr_set_sample_rate(rtlsdr_dev_t *dev, uint32_t samp_rate)
 {
 	int r = 0;
 	uint16_t tmp;
-	uint32_t rsamp_ratio;
+	uint32_t rsamp_ratio, real_rsamp_ratio;
 	double real_rate;
 
 	if (!dev)
 		return -1;
 
-	/* check for the maximum rate the resampler supports */
-	if (samp_rate > MAX_SAMP_RATE)
-		samp_rate = MAX_SAMP_RATE;
+	/* check if the rate is supported by the resampler */
+	if ((samp_rate <= 225000) || (samp_rate > 3200000) ||
+	   ((samp_rate > 300000) && (samp_rate <= 900000))) {
+		fprintf(stderr, "Invalid sample rate: %u Hz\n", samp_rate);
+		return -EINVAL;
+	}
 
 	rsamp_ratio = (dev->rtl_xtal * TWO_POW(22)) / samp_rate;
-	rsamp_ratio &= ~3;
+	rsamp_ratio &= 0x0ffffffc;
 
-	real_rate = (dev->rtl_xtal * TWO_POW(22)) / rsamp_ratio;
+	real_rsamp_ratio = rsamp_ratio | ((rsamp_ratio & 0x08000000) << 1);
+	real_rate = (dev->rtl_xtal * TWO_POW(22)) / real_rsamp_ratio;
 
 	if ( ((double)samp_rate) != real_rate )
 		fprintf(stderr, "Exact sample rate is: %f Hz\n", real_rate);
@@ -1499,6 +1503,7 @@ int rtlsdr_open(rtlsdr_dev_t **out_dev, uint32_t index)
 	if (reg == R82XX_CHECK_VAL) {
 		fprintf(stderr, "Found Rafael Micro R828D tuner\n");
 		dev->tuner_type = RTLSDR_TUNER_R828D;
+		goto found;
 	}
 
 	/* initialise GPIOs */
@@ -1725,6 +1730,7 @@ int rtlsdr_read_async(rtlsdr_dev_t *dev, rtlsdr_read_async_cb_t cb, void *ctx,
 	unsigned int i;
 	int r = 0;
 	struct timeval tv = { 1, 0 };
+	struct timeval zerotv = { 0, 0 };
 	enum rtlsdr_async_status next_status = RTLSDR_INACTIVE;
 
 	if (!dev)
@@ -1734,6 +1740,7 @@ int rtlsdr_read_async(rtlsdr_dev_t *dev, rtlsdr_read_async_cb_t cb, void *ctx,
 		return -2;
 
 	dev->async_status = RTLSDR_RUNNING;
+	dev->async_cancel = 0;
 
 	dev->cb = cb;
 	dev->cb_ctx = ctx;
@@ -1760,11 +1767,20 @@ int rtlsdr_read_async(rtlsdr_dev_t *dev, rtlsdr_read_async_cb_t cb, void *ctx,
 					  (void *)dev,
 					  BULK_TIMEOUT);
 
-		libusb_submit_transfer(dev->xfer[i]);
+		r = libusb_submit_transfer(dev->xfer[i]);
+		if (r < 0) {
+			fprintf(stderr, "Failed to submit transfer %i!\n", i);
+			dev->async_status = RTLSDR_CANCELING;
+			break;
+		}
 	}
 
 	while (RTLSDR_INACTIVE != dev->async_status) {
+#ifdef HAVE_LIBUSB_HANDLE_EVENTS_TIMEOUT_COMPLETED
+		r = libusb_handle_events_timeout_completed(dev->ctx, &tv, &dev->async_cancel);
+#else
 		r = libusb_handle_events_timeout(dev->ctx, &tv);
+#endif
 		if (r < 0) {
 			/*fprintf(stderr, "handle_events returned: %d\n", r);*/
 			if (r == LIBUSB_ERROR_INTERRUPTED) /* stray signal */
@@ -1784,13 +1800,23 @@ int rtlsdr_read_async(rtlsdr_dev_t *dev, rtlsdr_read_async_cb_t cb, void *ctx,
 
 				if (LIBUSB_TRANSFER_CANCELLED !=
 						dev->xfer[i]->status) {
-					libusb_cancel_transfer(dev->xfer[i]);
+					r = libusb_cancel_transfer(dev->xfer[i]);
+					if (r < 0)
+						continue;
+
 					next_status = RTLSDR_CANCELING;
 				}
 			}
 
 			if (dev->dev_lost || RTLSDR_INACTIVE == next_status) {
-				libusb_handle_events_timeout(dev->ctx, &tv);
+				/* handle any events that still need to
+				 * be handled before exiting after we
+				 * just cancelled all transfers */
+#ifdef HAVE_LIBUSB_HANDLE_EVENTS_TIMEOUT_COMPLETED
+				libusb_handle_events_timeout_completed(dev->ctx, &zerotv, NULL);
+#else
+				libusb_handle_events_timeout(dev->ctx, &zerotv);
+#endif
 				break;
 			}
 		}
@@ -1811,6 +1837,7 @@ int rtlsdr_cancel_async(rtlsdr_dev_t *dev)
 	/* if streaming, try to cancel gracefully */
 	if (RTLSDR_RUNNING == dev->async_status) {
 		dev->async_status = RTLSDR_CANCELING;
+		dev->async_cancel = 1;
 		return 0;
 	}
 
