@@ -1,3 +1,10 @@
+rtl-sdr (0.5.3~git20140210) UNRELEASED; urgency=low
+
+  * Merged upstream changes
+  * Renamed 'librtlsr' package to 'librtlsdr0'
+
+ -- Cedric Dufour <cedric.dufour@ced-network.net>  Mon, 07 Apr 2014 10:59:51 +0200
+
 rtl-sdr (0.5.3~git20140207) UNRELEASED; urgency=low
 
   * Merged upstream changes
