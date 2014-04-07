@@ -78,9 +78,9 @@ typedef struct { /* structure size must be multiple of 2 bytes */
 
 static rtlsdr_dev_t *dev = NULL;
 
-int global_numq = 0;
+static int global_numq = 0;
 static struct llist *ll_buffers = 0;
-int llbuf_num=500;
+static int llbuf_num = 500;
 
 static volatile int do_exit = 0;
 
@@ -92,7 +92,7 @@ void usage(void)
 		"\t[-f frequency to tune to [Hz]]\n"
 		"\t[-g gain (default: 0 for auto)]\n"
 		"\t[-s samplerate in Hz (default: 2048000 Hz)]\n"
-		"\t[-b number of buffers (default: 32, set by library)]\n"
+		"\t[-b number of buffers (default: 15, set by library)]\n"
 		"\t[-n max number of linked list buffers to keep (default: 500)]\n"
 		"\t[-d device index (default: 0)]\n"
 		"\t[-P ppm_error (default: 0)]\n");
