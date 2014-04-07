@@ -5,10 +5,10 @@ include /usr/share/cdbs/1/class/cmake.mk
 
 VERSION = $(shell ./git-version-gen src)
 
-install/librtlsdr::
+install/librtlsdr0::
 	# Copy udev rules
 	mkdir -p debian/tmp/lib/udev/rules.d
-	cp rtl-sdr.rules debian/tmp/lib/udev/rules.d/99-rtl-sdr.rules
+	cp rtl-sdr.rules debian/tmp/lib/udev/rules.d/90-librtlsdr.rules
 	# Copy modprobe configuration
 	mkdir -p debian/tmp/etc/modprobe.d
 	cp debian/etc/modprobe.d/librtlsdr.conf debian/tmp/etc/modprobe.d/librtlsdr.conf
