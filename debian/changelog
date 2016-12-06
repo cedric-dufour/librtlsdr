@@ -1,3 +1,9 @@
+rtl-sdr (0.5.3~git20161206~cd1) UNRELEASED; urgency=low
+
+  * Merged upstream/master changes
+
+ -- Cédric Dufour <cedric.dufour@ced-network.net>  Tue, 06 Dec 2016 15:55:28 +0100
+
 rtl-sdr (0.5.3~git20140823~cd1) UNRELEASED; urgency=low
 
   * Merged various pull request from upstream
